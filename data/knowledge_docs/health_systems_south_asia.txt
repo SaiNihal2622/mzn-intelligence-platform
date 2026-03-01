@@ -1,0 +1,77 @@
+PROJECT REPORT: Health Systems Strengthening in South Asia
+==========================================================
+
+Project ID: MZN-2023-SA-007
+Client: Ministry of Health & Family Welfare, Bangladesh
+Region: South Asia (Bangladesh, Nepal)
+Sector: Health Systems & Digital Health
+Duration: 24 months (March 2022 – February 2024)
+Budget: USD 3.8 million
+Funded by: Global Fund, USAID, DFID
+
+EXECUTIVE SUMMARY
+------------------
+MzN International provided technical assistance to strengthen primary healthcare
+delivery systems across 6 divisions in Bangladesh and 3 provinces in Nepal. The
+project focused on digital health information systems, community health worker
+capacity building, supply chain optimization, and quality improvement frameworks.
+The intervention reached approximately 4.2 million beneficiaries through 380
+upgraded health facilities.
+
+KEY INTERVENTIONS
+------------------
+1. Digital Health Information Systems
+   - Deployed interoperable electronic health records across 380 facilities
+   - Integrated DHIS2 dashboards for real-time disease surveillance
+   - Trained 1,200 health workers on data entry and quality assurance
+   - Established data governance framework aligned with WHO standards
+
+2. Community Health Worker Program
+   - Recruited and trained 850 community health workers (CHWs)
+   - Developed mobile-based decision support tools for CHWs
+   - Implemented performance-based incentive framework
+   - Created referral pathways between community and facility levels
+
+3. Supply Chain Optimization
+   - Implemented last-mile distribution tracking system
+   - Reduced essential medicine stockout rates from 34% to 8%
+   - Established district-level supply chain coordination committees
+   - Introduced demand forecasting models for seasonal disease patterns
+
+4. Quality Improvement
+   - Established quality improvement teams in 120 priority facilities
+   - Implemented WHO Service Availability and Readiness Assessment (SARA)
+   - Developed patient feedback mechanisms (SMS-based and community scorecards)
+   - Created clinical mentorship program linking tertiary and primary facilities
+
+RESULTS & IMPACT
+------------------
+- 62% improvement in data completeness across DHIS2 reporting
+- 41% increase in antenatal care coverage in target areas
+- 28% reduction in maternal mortality ratio (from 196 to 141 per 100,000)
+- Essential medicine availability increased from 66% to 92%
+- Patient satisfaction scores improved by 35 percentage points
+
+LESSONS LEARNED
+------------------
+- Digital systems require sustained technical support beyond initial deployment
+- Community health workers are most effective when integrated into formal health systems
+- Supply chain improvements have immediate and measurable impact on service delivery
+- Political economy analysis is essential for health system reform projects
+- Interoperability standards must be established early to avoid data silos
+
+STAKEHOLDER LANDSCAPE
+------------------
+- Ministries of Health (policy alignment, regulatory approval)
+- WHO Country Offices (technical standards, coordination)
+- UNICEF (immunization, nutrition integration)
+- icddr,b (research partnership, evidence generation)
+- Local health authorities (implementation, sustainability ownership)
+
+RECOMMENDATIONS
+------------------
+1. Expand digital health systems to remaining districts with phased approach
+2. Institutionalize CHW program within government health workforce
+3. Develop national health data exchange standards
+4. Create regional centers of excellence for quality improvement
+5. Establish public-private partnerships for sustainable health financing

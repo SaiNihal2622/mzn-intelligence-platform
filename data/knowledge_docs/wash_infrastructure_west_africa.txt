@@ -1,0 +1,78 @@
+PROJECT REPORT: WASH Infrastructure & Capacity Building in West Africa
+======================================================================
+
+Project ID: MZN-2023-WA-009
+Client: UNICEF West and Central Africa Regional Office
+Region: West Africa (Ghana, Senegal, Burkina Faso)
+Sector: Water, Sanitation & Hygiene (WASH)
+Duration: 24 months (January 2022 – December 2023)
+Budget: USD 4.2 million
+Funded by: UNICEF, World Bank, AfDB
+
+EXECUTIVE SUMMARY
+------------------
+This project strengthened WASH service delivery across 3 West African countries
+through infrastructure development, institutional capacity building, and community-led
+total sanitation (CLTS) approaches. The intervention reached 280,000 beneficiaries
+across 120 communities, constructing or rehabilitating 156 water points, 3,200
+household latrines, and 45 institutional WASH facilities in schools and health centers.
+
+KEY INTERVENTIONS
+------------------
+1. Water Supply Infrastructure
+   - Constructed 68 new boreholes with hand pumps
+   - Rehabilitated 88 existing water points
+   - Installed 12 solar-powered piped water systems
+   - Established water quality monitoring protocols across all systems
+   - Trained 156 community water management committees
+
+2. Sanitation Infrastructure & Behavior Change
+   - Implemented CLTS in 120 communities (92 achieved ODF status)
+   - Constructed 3,200 household latrines with local artisan training
+   - Built 45 WASH facilities in schools (gender-separated, disabilities-accessible)
+   - Developed sanitation marketing strategies for sustained demand
+
+3. Hygiene Promotion
+   - Trained 600 community hygiene promoters
+   - Distributed 15,000 hygiene kits during disease outbreak responses
+   - Established handwashing stations in all target schools and health facilities
+   - Created culturally adapted hygiene communication materials
+
+4. Institutional Strengthening
+   - Supported 3 national WASH sector coordination mechanisms
+   - Developed asset management frameworks for WASH infrastructure
+   - Created monitoring and evaluation systems using mobile data collection
+   - Trained 90 government WASH officers in project management
+
+RESULTS & IMPACT
+------------------
+- Access to improved water sources increased from 45% to 82% in target communities
+- Open defecation reduced by 76% across project areas
+- Diarrheal disease incidence decreased by 38% in children under five
+- 92 out of 120 communities achieved Open Defecation Free (ODF) certification
+- 94% of water systems functional at project end (vs. national average of 71%)
+
+LESSONS LEARNED
+------------------
+- CLTS is most effective when combined with sanitation marketing and supply chains
+- Gender-responsive WASH design increases utilization and sustainability
+- Asset management frameworks prevent infrastructure deterioration
+- Government co-investment signals ownership and improves sustainability
+- Cross-border coordination is valuable in shared river basin contexts
+
+STAKEHOLDER LANDSCAPE
+------------------
+- National WASH directorates (policy, regulation, coordination)
+- UNICEF, World Bank, AfDB (funding, technical oversight)
+- District/municipal governments (implementation, sustainability)
+- International NGOs: WaterAid, IRC (co-implementation, learning)
+- Local artisans and private sector (construction, supply chain)
+- Community leaders and women's groups (mobilization, governance)
+
+RECOMMENDATIONS
+------------------
+1. Scale solar-powered piped systems to replace hand pump infrastructure
+2. Develop national WASH asset management information systems
+3. Create sanitation enterprise models for private sector engagement
+4. Integrate WASH and nutrition programming for compound impact
+5. Establish climate-resilient water safety planning at community level

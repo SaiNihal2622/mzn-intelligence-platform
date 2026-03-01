@@ -1,0 +1,70 @@
+PROJECT REPORT: Community-Based Climate Adaptation in East Africa
+=================================================================
+
+Project ID: MZN-2024-EA-001
+Client: East African Development Authority (EADA)
+Region: East Africa (Kenya, Tanzania, Uganda)
+Sector: Climate Adaptation & Resilience
+Duration: 18 months (January 2023 – June 2024)
+Budget: USD 2.4 million
+Funded by: Green Climate Fund (GCF), SIDA
+
+EXECUTIVE SUMMARY
+------------------
+This project supported 14 rural communities across Kenya, Tanzania, and Uganda in
+building resilience to climate variability. The intervention focused on drought-resistant
+agriculture, rainwater harvesting infrastructure, and climate-smart livelihood
+diversification. Over 12,000 smallholder farmers were trained in conservation agriculture
+techniques, and 47 community water harvesting systems were installed.
+
+KEY INTERVENTIONS
+------------------
+1. Climate-Smart Agriculture Training
+   - Introduced drought-tolerant crop varieties (sorghum, millet, cowpea)
+   - Established 28 farmer field schools across three countries
+   - Trained 340 lead farmers as community climate champions
+   - Distributed climate information via mobile-based advisory services
+
+2. Water Harvesting Infrastructure
+   - Constructed 47 rainwater harvesting systems (rooftop and surface runoff)
+   - Rehabilitated 12 community boreholes with solar-powered pumps
+   - Trained 90 community water management committees
+   - Developed water resource management plans for each target community
+
+3. Livelihood Diversification
+   - Established 22 village savings and loan associations (VSLAs)
+   - Supported 180 women-led enterprises in climate-resilient value chains
+   - Connected producer groups to regional markets for drought-tolerant crops
+
+RESULTS & IMPACT
+------------------
+- 78% of target households reported improved food security
+- 45% reduction in water collection time for women and girls
+- Average crop yield increase of 32% through conservation agriculture
+- 94% of water committees remained operational at endline
+- USD 120,000 in cumulative savings mobilized through VSLAs
+
+LESSONS LEARNED
+------------------
+- Community ownership is critical: projects with local governance structures showed
+  3x higher sustainability rates
+- Gender-responsive design improved participation and outcomes
+- Integration of traditional knowledge with scientific approaches enhanced adoption
+- Mobile technology significantly reduced extension service costs
+- Early engagement of local government ensures policy alignment
+
+STAKEHOLDER LANDSCAPE
+------------------
+- National meteorological agencies (weather data partnerships)
+- County/district agricultural offices (extension service collaboration)
+- International NGOs: CARE, WFP, FAO (co-implementation)
+- Local civil society organizations (community mobilization)
+- Private sector: seed companies, mobile network operators
+
+RECOMMENDATIONS
+------------------
+1. Scale conservation agriculture training to additional districts
+2. Integrate climate risk insurance products for smallholder farmers
+3. Develop regional knowledge-sharing platform for climate adaptation
+4. Strengthen early warning systems with community-based monitoring
+5. Explore carbon credit mechanisms for sustainable funding

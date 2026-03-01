@@ -1,0 +1,72 @@
+PROJECT REPORT: Governance Reform & Anti-Corruption in Latin America
+====================================================================
+
+Project ID: MZN-2024-LA-003
+Client: Inter-American Development Bank (IDB)
+Region: Latin America (Colombia, Peru, Ecuador)
+Sector: Governance, Transparency & Anti-Corruption
+Duration: 18 months (July 2023 – December 2024)
+Budget: USD 2.1 million
+Funded by: IDB, EU, UNDP
+
+EXECUTIVE SUMMARY
+------------------
+MzN International supported governance reform initiatives across Colombia, Peru,
+and Ecuador focused on transparent public procurement, citizen participation
+mechanisms, and anti-corruption institutional strengthening. The project worked
+with 24 subnational governments and 45 civil society organizations to improve
+public financial management and democratic accountability. Open contracting
+reforms reached procurement processes worth over USD 800 million.
+
+KEY INTERVENTIONS
+------------------
+1. Open Contracting & Procurement Reform
+   - Implemented Open Contracting Data Standard (OCDS) in 24 municipalities
+   - Developed procurement analytics dashboards for public oversight
+   - Trained 180 procurement officers on transparency standards
+   - Established procurement review committees with civil society participation
+
+2. Citizen Participation Platforms
+   - Deployed civic technology platforms in 18 municipalities
+   - Trained 320 civil society activists in budget monitoring
+   - Established 36 citizen oversight committees for public works
+   - Created youth civic engagement programs reaching 5,000 young people
+
+3. Institutional Capacity Building
+   - Strengthened 12 anti-corruption agencies with technical assistance
+   - Developed risk-based audit methodologies for public investment
+   - Created inter-institutional coordination protocols
+   - Designed whistleblower protection guidelines aligned with international standards
+
+RESULTS & IMPACT
+------------------
+- 52% increase in procurement transparency scores (Open Budget Index)
+- USD 45 million in estimated savings from competitive procurement reforms
+- 340% increase in citizen participation in budget oversight processes
+- 67% of supported agencies adopted risk-based audit approaches
+- 23 corruption cases identified through procurement analytics
+
+LESSONS LEARNED
+------------------
+- Political will at leadership level is the strongest predictor of reform success
+- Open data alone is insufficient — citizen capacity to use data is equally important
+- Anti-corruption work requires long-term commitment beyond project cycles
+- Regional peer learning accelerates adoption of good practices
+- Technology solutions must be embedded in institutional processes to sustain
+
+STAKEHOLDER LANDSCAPE
+------------------
+- National comptroller/audit offices (institutional reform)
+- Municipal governments (procurement reform implementation)
+- Civil society networks: Transparency International chapters, local watchdogs
+- IDB, EU, UNDP (funding, technical oversight)
+- Academic institutions (research partnerships, evaluation)
+- Media organizations (investigative journalism, public awareness)
+
+RECOMMENDATIONS
+------------------
+1. Institutionalize open contracting through national legislation
+2. Create regional anti-corruption knowledge network
+3. Develop AI-powered procurement anomaly detection tools
+4. Expand citizen participation models to national budget processes
+5. Strengthen judicial capacity for corruption prosecution
