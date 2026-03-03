@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     embedding_model: str = "all-MiniLM-L6-v2"
     llm_model: str = "google/flan-t5-small"
     use_llm: bool = True
-    llm_provider: str = "gemini"  # gemini, openrouter, local
+    llm_provider: str = "openrouter"  # gemini, openrouter, local
     failproof_llm: bool = True
     
     # --- API Keys ---

@@ -45,6 +45,8 @@ async def generate_text(prompt: str, system_instruction: Optional[str] = None) -
     return "Generation failed. Please try again later or check your API keys."
 
 
+import httpx
+
 async def _call_gemini(prompt: str, system_instruction: Optional[str] = None) -> str:
     if not settings.gemini_api_key:
         raise ValueError("Gemini API key not configured")
@@ -64,9 +66,10 @@ async def _call_gemini(prompt: str, system_instruction: Optional[str] = None) ->
     if system_instruction:
         payload["system_instruction"] = {"parts": [{"text": system_instruction}]}
 
-    response = requests.post(url, json=payload, timeout=60)
-    response.raise_for_status()
-    data = response.json()
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        response = await client.post(url, json=payload)
+        response.raise_for_status()
+        data = response.json()
 
     # Guard against blocked/empty responses
     candidates = data.get("candidates", [])
@@ -97,12 +100,13 @@ async def _call_openrouter(prompt: str, system_instruction: Optional[str] = None
     messages.append({"role": "user", "content": prompt})
 
     payload = {
-        "model": "google/gemini-2.0-flash-001",  # Fast, high-quality via OpenRouter
+        "model": "google/gemini-2.0-flash-lite-preview-02-05:free",  # Fast, free via OpenRouter
         "messages": messages,
     }
 
-    response = requests.post(url, json=payload, headers=headers, timeout=60)
-    response.raise_for_status()
-    data = response.json()
+    async with httpx.AsyncClient(timeout=15.0) as client:
+        response = await client.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        data = response.json()
 
     return data["choices"][0]["message"]["content"]
