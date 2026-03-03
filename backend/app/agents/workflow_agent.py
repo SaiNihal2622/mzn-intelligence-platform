@@ -58,56 +58,29 @@ class WorkflowAgent:
             try:
                 system_instruction = (
                     "You are a Senior Project Management Consultant. "
-                    "You excel at breaking down complex development projects into logical, actionable work streams. "
-                    "Your task lists are detailed, technical, and account for realistic consultancy overhead."
+                    "You excel at breaking down complex development projects into logical, actionable work streams."
                 )
 
                 prompt = f"""
-Generate a detailed 2-sprint (4-week) implementation workflow for the following project:
+Generate a concise 2-sprint (4-week) implementation workflow:
 Sector: {sector}
 Region: {region}
 Description: {desc}
 
-RETRIEVED CONTEXT:
-{context.get('knowledge_context', 'No specific context available.')}
-
 REQUIREMENTS:
-- Generate 6-8 distinct, highly granular tasks.
-- Each task should have a realistic 'Estimated Hours' (e.g., 8, 16, 24).
-- Include specific 'Dependencies' referencing other task titles.
-- Use realistic dates starting from {datetime.now().strftime('%Y-%m-%d')}.
+- Generate 6 distinct tasks.
 
 OUTPUT FORMAT:
-Return ONLY a JSON list of objects. Each object MUST have:
-- 'title': Professional task title.
-- 'description': Multi-sentence markdown description explaining the technical requirement.
+Return ONLY a JSON list. Each object MUST have:
+- 'title': Short task title.
+- 'description': Single-sentence requirement.
 - 'hours': Integer.
-- 'start_date': YYYY-MM-DD.
-- 'end_date': YYYY-MM-DD.
-- 'dependencies': List of task titles or empty list.
-
-Example:
-[
-  {{
-    "title": "Stakeholder Mapping & UX Research",
-    "description": "Perform deep-dive interviews with local community leaders in {region} to identify primary friction points in {sector} interventions.",
-    "hours": 24,
-    "start_date": "2026-03-01",
-    "end_date": "2026-03-04",
-    "dependencies": []
-  }}
-]
+- 'dependencies': List of titles or [].
 """
-                
                 output = await generate_text(prompt, system_instruction=system_instruction)
                 import json
-                clean = output.strip()
-                # Strip markdown fences if present
-                if '```' in clean:
-                    clean = clean.split('```')[1]
-                    if clean.startswith('json'):
-                        clean = clean[4:]
-                tasks_raw = json.loads(clean.strip())
+                clean = output.strip().strip("```json").strip("```").strip()
+                tasks_raw = json.loads(clean)
                 if isinstance(tasks_raw, list):
                     return [_normalize_task(t, i) for i, t in enumerate(tasks_raw)]
             except Exception as e:

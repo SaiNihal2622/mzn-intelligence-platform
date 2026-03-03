@@ -38,12 +38,11 @@ Region: {region}
 Project: {description}
 
 REQUIREMENTS:
-1. Provide a detailed analysis of GDPR/Data Privacy risks specific to {region}.
-2. Identify at least two potential ethical risks (e.g., representation bias, technological exclusion).
-3. Suggest specific mitigation strategies for these risks.
+1. One paragraph on GDPR specific to {region}.
+2. Two bulleted ethical risks and mitigation bullets.
 
 OUTPUT FORMAT:
-Return a JSON list of strings. Each string MUST be a professional paragraph of advice.
+Return a JSON list of 3-4 professional advice strings.
 """
                 output = await generate_text(prompt, system_instruction=system_instruction)
                 import json

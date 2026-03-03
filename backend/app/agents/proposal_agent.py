@@ -55,14 +55,12 @@ DONOR FINDINGS:
 {funding_context}
 
 TASK:
-Generate a Technical Strategy Outline and a Consultant Executive Briefing.
+Generate a Concise Strategy Outline and an Executive Briefing.
 
 OUTPUT FORMAT:
 Return ONLY a JSON object with:
-- 'proposal_outline': Markdown string (detailed strategy).
-- 'consultant_briefing': Markdown string (deep analytical briefing).
-
-Return ONLY the JSON.
+- 'proposal_outline': Markdown string (concise strategy).
+- 'consultant_briefing': Markdown string (bulleted briefing).
 """
                 output = await generate_text(prompt, system_instruction=system_instruction)
                 
