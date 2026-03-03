@@ -16,10 +16,10 @@ class Settings(BaseSettings):
     """Central configuration loaded from environment variables / .env file."""
 
     # --- AI Model Settings ---
-    embedding_model: str = "all-MiniLM-L6-v2"
-    llm_model: str = "google/flan-t5-small"
     use_llm: bool = True
     llm_provider: str = "openrouter"  # Exclusive provider for stability
+    embedding_provider: str = "openrouter" # Added to support unified OpenRouter usage
+    embedding_model: str = "openai/text-embedding-3-small"
     failproof_llm: bool = True
     
     # --- API Keys ---

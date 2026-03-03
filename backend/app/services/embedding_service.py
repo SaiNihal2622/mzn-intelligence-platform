@@ -20,25 +20,23 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
+OPENROUTER_EMBED_URL = "https://openrouter.ai/api/v1/embeddings"
 GEMINI_EMBED_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent"
 
-# Embedding dimension for gemini-embedding-001
-EMBED_DIM = 3072
+# Embedding dimension for text-embedding-3-small (and Gemini)
+EMBED_DIM = 1536
 
 
 def _hash_embed(text: str, dim: int = EMBED_DIM) -> List[float]:
     """
     Deterministic hash-based fallback embedding.
     Produces consistent non-zero vectors for similarity comparisons.
-    Uses multiple hash seeds to fill the full dimension.
     """
     vec = np.zeros(dim, dtype=np.float64)
     words = text.lower().split()
     for word in words:
-        # Use word hash to index into embedding space
         h = int(hashlib.md5(word.encode()).hexdigest(), 16)
         idx = h % dim
-        # Value between -1 and 1 based on character content
         val = math.sin(h * 0.0001) 
         vec[idx] += val
     
@@ -48,39 +46,60 @@ def _hash_embed(text: str, dim: int = EMBED_DIM) -> List[float]:
     return vec.tolist()
 
 
-def _gemini_embed_single(text: str) -> List[float]:
-    """Call Gemini Embeddings API for a single text."""
-    if not settings.gemini_api_key:
-        logger.warning("No Gemini API key — using hash fallback embedding")
+def _call_openrouter_embed(text: str) -> List[float]:
+    """Call OpenRouter Embeddings API."""
+    if not settings.openrouter_api_key:
+        logger.error("OpenRouter API key missing for embeddings")
         return _hash_embed(text)
 
-    # Use header instead of query param to avoid leakage in logs
+    headers = {
+        "Authorization": f"Bearer {settings.openrouter_api_key}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "model": settings.embedding_model,
+        "input": text[:8000]
+    }
+
+    try:
+        resp = requests.post(OPENROUTER_EMBED_URL, json=payload, headers=headers, timeout=30)
+        if resp.status_code != 200:
+            logger.error("OpenRouter embed error %d: %s", resp.status_code, resp.text)
+            return _hash_embed(text)
+        data = resp.json()
+        return data["data"][0]["embedding"]
+    except Exception as e:
+        logger.error("OpenRouter embed request failed: %s", e)
+        return _hash_embed(text)
+
+
+def _call_gemini_embed(text: str) -> List[float]:
+    """Call Gemini Embeddings API securely via headers."""
+    if not settings.gemini_api_key:
+        return _hash_embed(text)
+
     headers = {"x-goog-api-key": settings.gemini_api_key}
     payload = {
-        "content": {
-            "parts": [{"text": text[:6000]}]
-        }
+        "content": {"parts": [{"text": text[:6000]}]}
     }
 
     try:
         resp = requests.post(GEMINI_EMBED_URL, json=payload, headers=headers, timeout=30)
         if resp.status_code != 200:
-            logger.error("Gemini embed API error %d: %s", resp.status_code, resp.text)
+            logger.error("Gemini embed error %d: %s", resp.status_code, resp.text)
             return _hash_embed(text)
         data = resp.json()
-        values = data.get("embedding", {}).get("values", [])
-        if not values:
-            logger.error("Empty embedding returned from Gemini API: %s", data)
-            return _hash_embed(text)
-        return values
+        return data.get("embedding", {}).get("values", [])
     except Exception as e:
-        logger.error("Gemini embed request failed: %s — using hash fallback", e)
+        logger.error("Gemini embed failed: %s", e)
         return _hash_embed(text)
 
 
 def embed_text(text: str) -> List[float]:
-    """Return the embedding vector for a single text string."""
-    return _gemini_embed_single(text)
+    """Return the embedding vector for a single text string using the configured provider."""
+    if settings.embedding_provider == "openrouter":
+        return _call_openrouter_embed(text)
+    return _call_gemini_embed(text)
 
 
 import concurrent.futures
