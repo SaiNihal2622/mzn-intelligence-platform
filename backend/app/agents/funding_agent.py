@@ -1,11 +1,12 @@
 """
 Funding Agent
 ==============
-Matches NGO projects with funding dataset based on keywords and semantic similarity.
+Matches NGO projects with funding dataset. 
+Pre-caches grant embeddings at startup for instant retrieval.
 """
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -15,70 +16,92 @@ from app.services.embedding_service import embed_batch, embed_text
 
 logger = logging.getLogger(__name__)
 
+# Module-level embedding cache
+_grants_cache: Optional[Dict[str, Any]] = None
+
+
+def _precompute_grant_embeddings():
+    """Pre-compute and cache all grant embeddings once."""
+    global _grants_cache
+    if _grants_cache is not None:
+        return _grants_cache
+
+    grants_path = settings.grants_path
+    if not grants_path.exists():
+        logger.warning("Grants file not found: %s", grants_path)
+        _grants_cache = {"df": pd.DataFrame(), "vectors": None, "norms": None}
+        return _grants_cache
+
+    logger.info("Pre-computing grant embeddings (one-time)...")
+    df = pd.read_csv(grants_path)
+    descriptions = df["description"].tolist()
+    vectors = np.array(embed_batch(descriptions), dtype=np.float32)
+    norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+
+    _grants_cache = {"df": df, "vectors": vectors, "norms": norms}
+    logger.info("Grant embeddings cached: %d grants × %d dims", *vectors.shape)
+    return _grants_cache
+
 
 class FundingAgent:
-    """Matches NGO projects with funding dataset."""
-    
+    """Matches NGO projects with funding dataset using cached embeddings."""
+
     def __init__(self, top_k: int = 5):
         self.top_k = top_k
-        self._grants_df = None
-
-    def _load_grants(self) -> pd.DataFrame:
-        if self._grants_df is None:
-            logger.info("Loading grants database from %s", settings.grants_path)
-            self._grants_df = pd.read_csv(settings.grants_path)
-        return self._grants_df
 
     async def execute(self, context: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Filter and rank funding opportunities."""
-        logger.info("▶ FundingAgent: Matching opportunities for sector=%s, region=%s", context["sector"], context["region"])
+        """Filter and rank funding opportunities using pre-cached embeddings."""
+        logger.info("▶ FundingAgent: Matching for sector=%s, region=%s", context["sector"], context["region"])
+
+        cache = _precompute_grant_embeddings()
+        df = cache["df"].copy()
         
-        df = self._load_grants()
-        sector_lower = context["sector"].lower()
-        region_lower = context["region"].lower()
+        if df.empty:
+            return []
 
         # Keyword filtering
+        sector_lower = context["sector"].lower()
+        region_lower = context["region"].lower()
         mask = (
             df["sector"].str.lower().isin([sector_lower, "multiple"])
         ) & (
             df["region"].str.lower().str.contains(region_lower)
             | df["region"].str.lower().str.contains("global")
         )
+        filtered_indices = df[mask].index.tolist()
 
-        filtered = df[mask].copy()
+        if not filtered_indices:
+            logger.info("No keyword matches; using all grants.")
+            filtered_indices = df.index.tolist()
 
-        if filtered.empty:
-            logger.info("No explicit matches; falling back to all grants.")
-            filtered = df.copy()
+        # Use pre-cached embeddings — only embed the query (1 API call)
+        all_vectors = cache["vectors"]
+        all_norms = cache["norms"]
+        grant_vectors = all_vectors[filtered_indices]
+        grant_norms = all_norms[filtered_indices]
 
-        # Semantic ranking
-        grant_descriptions = filtered["description"].tolist()
-        grant_vectors = np.array(embed_batch(grant_descriptions), dtype=np.float32)
         query_vector = np.array(embed_text(context["project_description"]), dtype=np.float32)
-
-        norms_g = np.linalg.norm(grant_vectors, axis=1, keepdims=True)
-        norms_g[norms_g == 0] = 1.0
         norm_q = np.linalg.norm(query_vector)
         if norm_q == 0:
             norm_q = 1.0
 
-        similarities = (grant_vectors @ query_vector) / (norms_g.flatten() * norm_q)
-        filtered["relevance_score"] = similarities
+        similarities = (grant_vectors @ query_vector) / (grant_norms.flatten() * norm_q)
 
-        top = filtered.nlargest(self.top_k, "relevance_score")
+        filtered_df = df.iloc[filtered_indices].copy()
+        filtered_df["relevance_score"] = similarities
+        top = filtered_df.nlargest(self.top_k, "relevance_score")
 
         results = []
         for _, row in top.iterrows():
-            results.append(
-                {
-                    "donor_name": row["donor_name"],
-                    "sector": row["sector"],
-                    "region": row["region"],
-                    "funding_size": row["funding_size"],
-                    "eligibility": row["eligibility"],
-                    "description": row["description"],
-                    "relevance_score": round(float(row["relevance_score"]), 4),
-                }
-            )
+            results.append({
+                "donor_name": row["donor_name"],
+                "sector": row["sector"],
+                "region": row["region"],
+                "funding_size": row["funding_size"],
+                "eligibility": row["eligibility"],
+                "description": row["description"],
+                "relevance_score": round(float(row["relevance_score"]), 4),
+            })
 
         return results

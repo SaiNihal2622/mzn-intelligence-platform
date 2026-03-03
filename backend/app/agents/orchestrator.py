@@ -1,12 +1,12 @@
 """
 Agent Orchestrator
 ===================
-Coordinates the sequential execution of all agents in the Development
-Intelligence Platform.
+Coordinates parallel + sequential execution of all agents for maximum speed.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 from typing import Any, Dict
@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 
 
 class AgentOrchestrator:
-    """Orchestrates the multi-agent workflow sequentially."""
-    
+    """Orchestrates the multi-agent workflow with maximum parallelism."""
+
     def __init__(self):
         self.planner = PlannerAgent()
         self.knowledge = KnowledgeAgent()
@@ -38,7 +38,7 @@ class AgentOrchestrator:
         region: str,
         project_description: str,
     ) -> Dict[str, Any]:
-        """Execute the full agent pipeline for a client project."""
+        """Execute the full agent pipeline with parallel stages."""
         start = time.time()
         logger.info(
             "═══ Orchestrator: starting pipeline for sector=%s, region=%s ═══",
@@ -46,25 +46,23 @@ class AgentOrchestrator:
             region,
         )
 
-        # 1. Planner Agent understands input and sets up context
+        # Stage 1: Planner (fast, no API calls)
         context = await self.planner.execute(sector, region, project_description)
 
-        # 2. Knowledge Agent performs RAG
-        similar_projects = await self.knowledge.execute(context)
+        # Stage 2: Knowledge + Funding IN PARALLEL (both independent)
+        knowledge_task = asyncio.create_task(self.knowledge.execute(context))
+        funding_task = asyncio.create_task(self.funding.execute(context))
+        similar_projects, matched_funding = await asyncio.gather(knowledge_task, funding_task)
 
-        # 3. Funding Agent matches opportunities
-        matched_funding = await self.funding.execute(context)
-
-        # 4. Proposal Agent generates structured outline and briefing
+        # Stage 3: Proposal (needs knowledge + funding results)
         proposal_outline, consultant_briefing = await self.proposal.execute(
             context, similar_projects, matched_funding
         )
 
-        # 5. Workflow Agent creates task checklist
-        workflow_tasks = await self.workflow.execute(context)
-
-        # 6. Compliance Agent adds GDPR and responsible AI notes
-        compliance_notes = await self.compliance.execute(context, proposal_outline)
+        # Stage 4: Workflow + Compliance IN PARALLEL (both independent)
+        workflow_task = asyncio.create_task(self.workflow.execute(context))
+        compliance_task = asyncio.create_task(self.compliance.execute(context, proposal_outline))
+        workflow_tasks, compliance_notes = await asyncio.gather(workflow_task, compliance_task)
 
         elapsed = round(time.time() - start, 2)
         logger.info("═══ Orchestrator: pipeline completed in %.2fs ═══", elapsed)
@@ -86,7 +84,7 @@ class AgentOrchestrator:
                     "FundingAgent",
                     "ProposalAgent",
                     "WorkflowAgent",
-                    "ComplianceAgent"
-                ]
-            }
+                    "ComplianceAgent",
+                ],
+            },
         }
