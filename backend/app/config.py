@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     failproof_llm: bool = True
     
     # --- API Keys ---
-    gemini_api_key: str = "AIzaSyAEaPm5PZYjcr24guqEDvItKuWvyj7k1vo"
-    openrouter_api_key: str = "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"
+    gemini_api_key: str = ""
+    openrouter_api_key: str = ""
 
     # --- Server ---
     host: str = "0.0.0.0"
