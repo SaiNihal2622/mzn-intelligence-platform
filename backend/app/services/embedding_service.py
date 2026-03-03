@@ -3,11 +3,14 @@ Embedding Service
 ==================
 Uses the Gemini Embeddings API (text-embedding-004) for dense vector embeddings.
 No local ML models — zero torch dependency.
+Falls back to TF-IDF style hashing when API is unavailable.
 """
 
 from __future__ import annotations
 
 import logging
+import hashlib
+import math
 import requests
 from typing import List
 
@@ -17,46 +20,74 @@ from app.config import settings
 
 logger = logging.getLogger(__name__)
 
-GEMINI_EMBED_URL = "https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent"
+GEMINI_EMBED_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent"
 
-# Embedding dimension for text-embedding-004
-EMBED_DIM = 768
+# Embedding dimension for gemini-embedding-001
+EMBED_DIM = 3072
+
+
+def _hash_embed(text: str, dim: int = EMBED_DIM) -> List[float]:
+    """
+    Deterministic hash-based fallback embedding.
+    Produces consistent non-zero vectors for similarity comparisons.
+    Uses multiple hash seeds to fill the full dimension.
+    """
+    vec = np.zeros(dim, dtype=np.float64)
+    words = text.lower().split()
+    for word in words:
+        # Use word hash to index into embedding space
+        h = int(hashlib.md5(word.encode()).hexdigest(), 16)
+        idx = h % dim
+        # Value between -1 and 1 based on character content
+        val = math.sin(h * 0.0001) 
+        vec[idx] += val
+    
+    norm = np.linalg.norm(vec)
+    if norm > 0:
+        vec = vec / norm
+    return vec.tolist()
 
 
 def _gemini_embed_single(text: str) -> List[float]:
     """Call Gemini Embeddings API for a single text."""
     if not settings.gemini_api_key:
-        # Fallback: random-ish deterministic vector (for offline dev only)
-        rng = np.random.default_rng(abs(hash(text[:64])))
-        v = rng.standard_normal(EMBED_DIM)
-        return (v / np.linalg.norm(v)).tolist()
+        logger.warning("No Gemini API key — using hash fallback embedding")
+        return _hash_embed(text)
 
     url = f"{GEMINI_EMBED_URL}?key={settings.gemini_api_key}"
     payload = {
-        "model": "models/text-embedding-004",
-        "content": {"parts": [{"text": text[:8000]}]},  # API limit
+        "content": {
+            "parts": [{"text": text[:6000]}]
+        }
     }
-    resp = requests.post(url, json=payload, timeout=20)
-    resp.raise_for_status()
-    return resp.json()["embedding"]["values"]
+
+    try:
+        resp = requests.post(url, json=payload, timeout=30)
+        if resp.status_code != 200:
+            logger.error("Gemini embed API error %d: %s", resp.status_code, resp.text[:200])
+            return _hash_embed(text)
+        data = resp.json()
+        values = data.get("embedding", {}).get("values", [])
+        if not values:
+            logger.error("Empty embedding returned from Gemini API: %s", data)
+            return _hash_embed(text)
+        return values
+    except Exception as e:
+        logger.error("Gemini embed request failed: %s — using hash fallback", e)
+        return _hash_embed(text)
 
 
 def embed_text(text: str) -> List[float]:
     """Return the embedding vector for a single text string."""
-    try:
-        return _gemini_embed_single(text)
-    except Exception as e:
-        logger.error("Embedding failed for text snippet: %s", e)
-        # Return zero vector on failure so pipeline doesn't crash
-        return [0.0] * EMBED_DIM
+    return _gemini_embed_single(text)
 
 
 def embed_batch(texts: List[str], batch_size: int = 50) -> List[List[float]]:
-    """Return embedding vectors for a batch of texts (sequential API calls)."""
+    """Return embedding vectors for a batch of texts."""
     results = []
     for i, text in enumerate(texts):
         vec = embed_text(text)
         results.append(vec)
-        if (i + 1) % 20 == 0:
+        if (i + 1) % 10 == 0:
             logger.info("Embedded %d/%d texts", i + 1, len(texts))
     return results
