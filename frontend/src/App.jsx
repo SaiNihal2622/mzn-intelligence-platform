@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import InputPanel from './components/InputPanel';
 import ResultsDashboard from './components/ResultsDashboard';
+import DocumentChat from './components/DocumentChat';
 import { analyzeProject } from './services/api';
 
 function App() {
@@ -204,6 +205,10 @@ Aggregated Structured JSON Payload
               </div>
             </div>
           </div>
+        )}
+
+        {activeTab === 'docchat' && (
+          <DocumentChat />
         )}
 
       </main>

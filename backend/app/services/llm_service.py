@@ -1,8 +1,7 @@
 """
 LLM Service
 ===========
-Handles text generation using local models, Gemini API, or OpenRouter API.
-Implements failover logic as requested.
+Handles text generation using Gemini API or OpenRouter API.
 """
 
 import logging
@@ -11,20 +10,6 @@ from typing import Optional
 from app.config import settings
 
 logger = logging.getLogger(__name__)
-
-# Lazy-loaded local model
-_local_pipeline = None
-
-def _get_local_pipeline():
-    global _local_pipeline
-    if _local_pipeline is None:
-        try:
-            from transformers import pipeline
-            logger.info("Loading local LLM model: %s", settings.llm_model)
-            _local_pipeline = pipeline("text2text-generation", model=settings.llm_model)
-        except Exception as e:
-            logger.error("Failed to load local model: %s", e)
-    return _local_pipeline
 
 async def generate_text(prompt: str, system_instruction: Optional[str] = None) -> str:
     """

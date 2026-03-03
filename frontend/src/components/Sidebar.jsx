@@ -41,6 +41,13 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                     <span className="nav-icon">📈</span>
                     Workflow Insights
                 </button>
+                <button
+                    className={`nav-item ${activeTab === 'docchat' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('docchat')}
+                >
+                    <span className="nav-icon">💬</span>
+                    Document Chat
+                </button>
             </nav>
 
             <div className="sidebar-bottom">
