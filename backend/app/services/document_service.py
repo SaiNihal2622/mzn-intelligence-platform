@@ -1,8 +1,9 @@
 """
 Document Service
 ================
-Handles PDF/TXT upload, text extraction, FAISS indexing per session,
+Handles PDF/TXT upload, text extraction, numpy vector indexing per session,
 and question-answering using the existing LLM service.
+Uses Gemini Embeddings API for vectorization — no torch dependency.
 """
 
 import io
@@ -11,24 +12,13 @@ import logging
 import numpy as np
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
-from sentence_transformers import SentenceTransformer
-import faiss
+
+from app.services.embedding_service import embed_text, embed_batch
 
 logger = logging.getLogger(__name__)
 
-# Global in-memory session store: { doc_id: { "chunks": [...], "index": faiss_index, "filename": str } }
+# Global in-memory session store: { doc_id: { "chunks": [...], "matrix": np.ndarray, "filename": str } }
 _document_sessions: Dict[str, dict] = {}
-
-# Shared embedding model (loaded once)
-_embedding_model: Optional[SentenceTransformer] = None
-
-
-def _get_embedding_model() -> SentenceTransformer:
-    global _embedding_model
-    if _embedding_model is None:
-        logger.info("Loading embedding model for document service...")
-        _embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-    return _embedding_model
 
 
 def _extract_text_from_pdf(file_bytes: bytes) -> str:
@@ -48,7 +38,7 @@ def _extract_text_from_pdf(file_bytes: bytes) -> str:
 
 
 def _chunk_text(text: str, chunk_size: int = 400, overlap: int = 80) -> List[str]:
-    """Split text into overlapping chunks."""
+    """Split text into overlapping word-based chunks."""
     words = text.split()
     chunks = []
     start = 0
@@ -62,7 +52,7 @@ def _chunk_text(text: str, chunk_size: int = 400, overlap: int = 80) -> List[str
 
 def process_document(file_bytes: bytes, filename: str) -> str:
     """
-    Parse the document, chunk it, embed it, and store in a FAISS index.
+    Parse the document, chunk it, embed it, and store as a numpy matrix.
     Returns a doc_id used for future queries.
     """
     extension = Path(filename).suffix.lower()
@@ -80,18 +70,18 @@ def process_document(file_bytes: bytes, filename: str) -> str:
     chunks = _chunk_text(text)
     logger.info("Document '%s' → %d chunks", filename, len(chunks))
 
-    model = _get_embedding_model()
-    embeddings = model.encode(chunks, show_progress_bar=False, normalize_embeddings=True)
-    embeddings_np = np.array(embeddings, dtype="float32")
+    vectors = embed_batch(chunks)
+    matrix = np.array(vectors, dtype=np.float32)
 
-    dimension = embeddings_np.shape[1]
-    index = faiss.IndexFlatIP(dimension)  # Inner product for cosine similarity
-    index.add(embeddings_np)
+    # Normalize for cosine similarity
+    norms = np.linalg.norm(matrix, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    matrix = matrix / norms
 
     doc_id = str(uuid.uuid4())
     _document_sessions[doc_id] = {
         "chunks": chunks,
-        "index": index,
+        "matrix": matrix,
         "filename": filename,
         "text_preview": text[:300],
     }
@@ -101,21 +91,20 @@ def process_document(file_bytes: bytes, filename: str) -> str:
 
 
 def retrieve_relevant_chunks(doc_id: str, question: str, top_k: int = 4) -> Tuple[List[str], str]:
-    """
-    Retrieve the most relevant document chunks for a given question.
-    Returns (chunks, filename).
-    """
+    """Retrieve the most relevant document chunks for a given question."""
     session = _document_sessions.get(doc_id)
     if not session:
         raise ValueError(f"Document session '{doc_id}' not found. Please re-upload the document.")
 
-    model = _get_embedding_model()
-    query_embedding = model.encode([question], normalize_embeddings=True)
-    query_np = np.array(query_embedding, dtype="float32")
+    query_vec = np.array(embed_text(question), dtype=np.float32)
+    norm = np.linalg.norm(query_vec)
+    if norm > 0:
+        query_vec = query_vec / norm
 
-    distances, indices = session["index"].search(query_np, min(top_k, len(session["chunks"])))
+    scores = session["matrix"] @ query_vec
+    top_indices = np.argsort(scores)[::-1][:min(top_k, len(session["chunks"]))]
 
-    relevant_chunks = [session["chunks"][i] for i in indices[0] if i != -1]
+    relevant_chunks = [session["chunks"][i] for i in top_indices]
     return relevant_chunks, session["filename"]
 
 

@@ -1,6 +1,7 @@
 # ============================================================
 # Consultancy Intelligence Agent – Python Dependencies
 # ============================================================
+# NO torch/ML libraries — uses Gemini API for all intelligence.
 # Compatible with Python 3.10+
 
 # --- Web Framework ---
@@ -8,9 +9,8 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 python-multipart==0.0.9
 
-# --- AI / ML (lightweight - no PyTorch) ---
-sentence-transformers==3.3.1
-faiss-cpu==1.9.0.post1
+# --- Vector Math (torch-free) ---
+numpy==2.0.2
 
 # --- Document Processing ---
 pypdf==4.3.1
