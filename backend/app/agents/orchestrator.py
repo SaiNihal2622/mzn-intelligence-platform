@@ -49,20 +49,25 @@ class AgentOrchestrator:
         # Stage 1: Planner (fast, no API calls)
         context = await self.planner.execute(sector, region, project_description)
 
-        # Stage 2: Knowledge + Funding IN PARALLEL (both independent)
+        # Stage 1: Async Start for ALL independent agents
+        # These 4 can all run at once.
         knowledge_task = asyncio.create_task(self.knowledge.execute(context))
         funding_task = asyncio.create_task(self.funding.execute(context))
-        similar_projects, matched_funding = await asyncio.gather(knowledge_task, funding_task)
-
-        # Stage 3: Proposal (needs knowledge + funding results)
-        proposal_outline, consultant_briefing = await self.proposal.execute(
-            context, similar_projects, matched_funding
-        )
-
-        # Stage 4: Workflow + Compliance IN PARALLEL (both independent)
         workflow_task = asyncio.create_task(self.workflow.execute(context))
-        compliance_task = asyncio.create_task(self.compliance.execute(context, proposal_outline))
-        workflow_tasks, compliance_notes = await asyncio.gather(workflow_task, compliance_task)
+        compliance_task = asyncio.create_task(self.compliance.execute(context))
+
+        # Stage 2: Wait ONLY for Knowledge + Funding (needed for Proposal)
+        similar_projects, matched_funding = await asyncio.gather(knowledge_task, funding_task)
+        logger.info("▶ Stage 2 Complete: Knowledge + Funding ready. Starting Proposal.")
+
+        # Stage 3: Proposal depends on Knowledge+Funding results
+        proposal_task = asyncio.create_task(self.proposal.execute(context, similar_projects, matched_funding))
+
+        # Stage 4: Final Gather of EVERYTHING
+        # This allows Proposal, Workflow, and Compliance to finish in parallel.
+        (proposal_outline, consultant_briefing), workflow_tasks, compliance_notes = await asyncio.gather(
+            proposal_task, workflow_task, compliance_task
+        )
 
         elapsed = round(time.time() - start, 2)
         logger.info("═══ Orchestrator: pipeline completed in %.2fs ═══", elapsed)

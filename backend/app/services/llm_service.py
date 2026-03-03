@@ -13,6 +13,23 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 
+import httpx
+
+# Shared persistent client for connection pooling
+_client_instance: Optional[httpx.AsyncClient] = None
+
+def get_llm_client() -> httpx.AsyncClient:
+    """Return a shared, thread-safe AsyncClient for all LLM requests."""
+    global _client_instance
+    if _client_instance is None or _client_instance.is_closed:
+        _client_instance = httpx.AsyncClient(
+            timeout=30.0,
+            limits=httpx.Limits(max_connections=100, max_keepalive_connections=20),
+            follow_redirects=True
+        )
+    return _client_instance
+
+
 async def generate_text(prompt: str, system_instruction: Optional[str] = None) -> str:
     """
     Main entry point for text generation.
@@ -48,12 +65,12 @@ async def _call_gemini(prompt: str, system_instruction: Optional[str] = None) ->
     if system_instruction:
         payload["system_instruction"] = {"parts": [{"text": system_instruction}]}
 
-    async with httpx.AsyncClient(timeout=15.0) as client:
-        response = await client.post(url, json=payload, headers=headers)
-        if response.status_code != 200:
-            logger.error(f"Gemini error {response.status_code}: {response.text}")
-            response.raise_for_status()
-        data = response.json()
+    client = get_llm_client()
+    response = await client.post(url, json=payload, headers=headers)
+    if response.status_code != 200:
+        logger.error(f"Gemini error {response.status_code}: {response.text}")
+        response.raise_for_status()
+    data = response.json()
 
     # Guard against blocked/empty responses
     candidates = data.get("candidates", [])
@@ -90,11 +107,11 @@ async def _call_openrouter(prompt: str, system_instruction: Optional[str] = None
         "messages": messages,
     }
 
-    async with httpx.AsyncClient(timeout=15.0) as client:
-        response = await client.post(url, json=payload, headers=headers)
-        if response.status_code != 200:
-            logger.error(f"OpenRouter error {response.status_code}: {response.text}")
-            response.raise_for_status()
-        data = response.json()
+    client = get_llm_client()
+    response = await client.post(url, json=payload, headers=headers)
+    if response.status_code != 200:
+        logger.error(f"OpenRouter error {response.status_code}: {response.text}")
+        response.raise_for_status()
+    data = response.json()
 
     return data["choices"][0]["message"]["content"]

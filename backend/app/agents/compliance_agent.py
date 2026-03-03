@@ -15,12 +15,13 @@ logger = logging.getLogger(__name__)
 class ComplianceAgent:
     """Adds GDPR and responsible AI notes using LLMs."""
     
-    async def execute(self, context: Dict[str, Any], proposal: Dict[str, Any]) -> str:
+    async def execute(self, context: Dict[str, Any]) -> str:
         """Generate compliance and ethics notes via LLM."""
         logger.info("▶ ComplianceAgent: Generating GDPR and responsible AI notes via LLM")
         
         region = context["region"]
         sector = context["sector"]
+        description = context["project_description"]
         
         if settings.use_llm:
             try:
@@ -32,34 +33,25 @@ class ComplianceAgent:
 
                 prompt = f"""
 Perform a deep Ethical & Regulatory compliance review for:
-Sector: {context['sector']}
-Region: {context['region']}
-Project: {context['project_description']}
+Sector: {sector}
+Region: {region}
+Project: {description}
 
 REQUIREMENTS:
-1. Provide a detailed analysis of GDPR/Data Privacy risks specific to {context['region']}.
+1. Provide a detailed analysis of GDPR/Data Privacy risks specific to {region}.
 2. Identify at least two potential ethical risks (e.g., representation bias, technological exclusion).
 3. Suggest specific mitigation strategies for these risks.
 
 OUTPUT FORMAT:
-Return a JSON list of strings. Each string MUST be a comprehensive, multi-sentence paragraph of professional advice.
-Avoid simple bullet points; use deep analytical prose.
+Return a JSON list of strings. Each string MUST be a professional paragraph of advice.
 """
                 output = await generate_text(prompt, system_instruction=system_instruction)
                 import json
-                clean = output.strip()
-                if '```' in clean:
-                    clean = clean.split('```')[1]
-                    if clean.startswith('json'):
-                        clean = clean[4:]
-                parsed = json.loads(clean.strip())
-                # Always return a string regardless of what LLM returned
+                clean = output.strip().strip("```json").strip("```").strip()
+                parsed = json.loads(clean)
                 if isinstance(parsed, list):
                     return "\n\n".join(str(item) for item in parsed)
-                elif isinstance(parsed, str):
-                    return parsed
-                else:
-                    return str(parsed)
+                return str(parsed)
             except Exception as e:
                 logger.error(f"ComplianceAgent LLM failed: {e}")
 
