@@ -47,8 +47,19 @@ Avoid simple bullet points; use deep analytical prose.
 """
                 output = await generate_text(prompt, system_instruction=system_instruction)
                 import json
-                clean_json = output.strip().strip("```json").strip("```").strip()
-                return json.loads(clean_json)
+                clean = output.strip()
+                if '```' in clean:
+                    clean = clean.split('```')[1]
+                    if clean.startswith('json'):
+                        clean = clean[4:]
+                parsed = json.loads(clean.strip())
+                # Always return a string regardless of what LLM returned
+                if isinstance(parsed, list):
+                    return "\n\n".join(str(item) for item in parsed)
+                elif isinstance(parsed, str):
+                    return parsed
+                else:
+                    return str(parsed)
             except Exception as e:
                 logger.error(f"ComplianceAgent LLM failed: {e}")
 

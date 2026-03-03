@@ -12,6 +12,37 @@ from app.services.llm_service import generate_text
 
 logger = logging.getLogger(__name__)
 
+SPRINT_LABELS = ["Sprint 1 – Week 1", "Sprint 1 – Week 2", "Sprint 2 – Week 1", "Sprint 2 – Week 2"]
+PRIORITY_ORDER = ["critical", "high", "medium", "low"]
+OWNER_ROLES = ["Senior Consultant", "Research Analyst", "Business Development Lead", "Proposal Writer", "QA Lead", "Project Manager"]
+
+
+def _normalize_task(raw: dict, idx: int) -> dict:
+    """Map any LLM task format to the strict WorkflowTask schema."""
+    today = datetime.utcnow().date()
+    offset = idx * 3  # Spread tasks 3 days apart
+    start = raw.get("start_date", str(today + timedelta(days=offset)))
+    end = raw.get("end_date") or raw.get("due_date") or str(today + timedelta(days=offset + 3))
+    hours = raw.get("estimated_hours") or raw.get("hours") or 16
+    sprint_idx = min(idx // 2, len(SPRINT_LABELS) - 1)
+    priority_idx = min(idx, len(PRIORITY_ORDER) - 1)
+    owner_idx = idx % len(OWNER_ROLES)
+
+    return {
+        "task_id": raw.get("task_id", f"TASK-{idx + 1:03d}"),
+        "title": raw.get("title", f"Task {idx + 1}"),
+        "description": raw.get("description", ""),
+        "owner": raw.get("owner", OWNER_ROLES[owner_idx]),
+        "priority": raw.get("priority", PRIORITY_ORDER[priority_idx]),
+        "sprint": raw.get("sprint", SPRINT_LABELS[sprint_idx]),
+        "estimated_hours": int(hours) if str(hours).isdigit() else 16,
+        "start_date": start,
+        "due_date": end,
+        "status": raw.get("status", "pending"),
+        "dependencies": raw.get("dependencies", []),
+    }
+
+
 
 class WorkflowAgent:
     """Produces consultant task checklist using LLMs."""
@@ -70,10 +101,15 @@ Example:
                 
                 output = await generate_text(prompt, system_instruction=system_instruction)
                 import json
-                clean_json = output.strip().strip("```json").strip("```").strip()
-                tasks = json.loads(clean_json)
-                if isinstance(tasks, list):
-                    return tasks
+                clean = output.strip()
+                # Strip markdown fences if present
+                if '```' in clean:
+                    clean = clean.split('```')[1]
+                    if clean.startswith('json'):
+                        clean = clean[4:]
+                tasks_raw = json.loads(clean.strip())
+                if isinstance(tasks_raw, list):
+                    return [_normalize_task(t, i) for i, t in enumerate(tasks_raw)]
             except Exception as e:
                 logger.error(f"WorkflowAgent LLM failed: {e}")
 
