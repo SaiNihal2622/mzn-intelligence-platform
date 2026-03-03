@@ -34,10 +34,9 @@ async def _call_gemini(prompt: str, system_instruction: Optional[str] = None) ->
     if not settings.gemini_api_key:
         raise ValueError("Gemini API key not configured")
 
-    url = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/"
-        f"gemini-1.5-flash:generateContent?key={settings.gemini_api_key}"
-    )
+    # Use header instead of query param to avoid leakage in logs
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+    headers = {"x-goog-api-key": settings.gemini_api_key}
 
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
@@ -50,8 +49,10 @@ async def _call_gemini(prompt: str, system_instruction: Optional[str] = None) ->
         payload["system_instruction"] = {"parts": [{"text": system_instruction}]}
 
     async with httpx.AsyncClient(timeout=15.0) as client:
-        response = await client.post(url, json=payload)
-        response.raise_for_status()
+        response = await client.post(url, json=payload, headers=headers)
+        if response.status_code != 200:
+            logger.error(f"Gemini error {response.status_code}: {response.text}")
+            response.raise_for_status()
         data = response.json()
 
     # Guard against blocked/empty responses
@@ -75,6 +76,8 @@ async def _call_openrouter(prompt: str, system_instruction: Optional[str] = None
     headers = {
         "Authorization": f"Bearer {settings.openrouter_api_key}",
         "Content-Type": "application/json",
+        "HTTP-Referer": "https://mzn-intelligence-platform.up.railway.app",  # Recommended by OpenRouter
+        "X-Title": "MZN Intelligence Platform",
     }
 
     messages = []
@@ -89,7 +92,9 @@ async def _call_openrouter(prompt: str, system_instruction: Optional[str] = None
 
     async with httpx.AsyncClient(timeout=15.0) as client:
         response = await client.post(url, json=payload, headers=headers)
-        response.raise_for_status()
+        if response.status_code != 200:
+            logger.error(f"OpenRouter error {response.status_code}: {response.text}")
+            response.raise_for_status()
         data = response.json()
 
     return data["choices"][0]["message"]["content"]

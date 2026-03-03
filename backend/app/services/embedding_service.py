@@ -54,7 +54,8 @@ def _gemini_embed_single(text: str) -> List[float]:
         logger.warning("No Gemini API key — using hash fallback embedding")
         return _hash_embed(text)
 
-    url = f"{GEMINI_EMBED_URL}?key={settings.gemini_api_key}"
+    # Use header instead of query param to avoid leakage in logs
+    headers = {"x-goog-api-key": settings.gemini_api_key}
     payload = {
         "content": {
             "parts": [{"text": text[:6000]}]
@@ -62,9 +63,9 @@ def _gemini_embed_single(text: str) -> List[float]:
     }
 
     try:
-        resp = requests.post(url, json=payload, timeout=30)
+        resp = requests.post(GEMINI_EMBED_URL, json=payload, headers=headers, timeout=30)
         if resp.status_code != 200:
-            logger.error("Gemini embed API error %d: %s", resp.status_code, resp.text[:200])
+            logger.error("Gemini embed API error %d: %s", resp.status_code, resp.text)
             return _hash_embed(text)
         data = resp.json()
         values = data.get("embedding", {}).get("values", [])
