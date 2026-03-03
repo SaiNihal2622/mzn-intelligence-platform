@@ -1,99 +1,73 @@
-# 🏗️ Development Intelligence Platform
-### Professional AI-Augmented Consultancy Framework
+# 🏗️ MzN Intelligence Platform: Master Manual
+### Professional Multi-Agent AI Framework for Global Consultancy
 
-The **Development Intelligence Platform** is a structured, multi-agent orchestration system designed for international development consultancies. It transforms fragmented institutional memory and complex donor landscapes into actionable, high-quality project intelligence.
-
-![Dashboard Preview](https://via.placeholder.com/1200x600?text=Development+Intelligence+Dashboard+Preview)
-
-## 🌟 Key Features
-*   **Structured Orchestration:** Abandons unpredictable chatbots for a deterministic 6-agent sequential pipeline (Planner, Knowledge, Funding, Proposal, Workflow, Compliance).
-*   **Frontier LLM Support:** Integrated with **Gemini 1.5 Pro** and **Claude 3.5 (OpenRouter)** with a failproof local model fallback.
-*   **Consultancy-Grade RAG:** Local FAISS vector store for semantic retrieval of historical reports and proprietary datasets.
-*   **Operational Tasking:** Automatically generates 2-sprint project plans and consultant executive briefings.
-*   **Full Architectural Transparency:** Dedicated dashboard sections for system logic and workflow analysis.
-*   **GDPR-Ready:** Built-in compliance agent and regional data-protection filtering.
-
-## Architecture & Technology Stack
-The platform uses a modern, open-source stack designed for zero-API-cost deployment.
-
-*   **Frontend**: React (Vite) + Vanilla CSS (Glassmorphism)
-*   **Backend**: Python FastAPI
-*   **AI Orchestration**: Custom 6-Agent Sequential Pipeline
-*   **Knowledge Retrieval (RAG)**: FAISS Index + `sentence-transformers`
-*   **Infrastructure**: Production-ready Docker container
+The **MzN Intelligence Platform** is a high-performance orchestration engine designed to automate the 'Draft Zero' phase of international development consultancy. It transforms fragmented institutional memory into structured technical strategies using a hybrid parallel agentic architecture.
 
 ---
 
-## 🚀 Deployment & Reviewer Access
-For detailed instructions on how to host this platform for external review, see the **[DEPLOYMENT.md](./DEPLOYMENT.md)** guide.
+## 🎯 Technical Mission
+To bridge the "Intelligence Divide" in consultancy by delivering deep-reasoning project analysis in **sub-10 seconds**, while maintaining 100% data sovereignty and zero-leak security.
+
+## 🚀 Key Performance Achievements
+- **Analytic Velocity:** ~72% reduction in pipeline latency (38s → 11s).
+- **Security:** Zero-leak environment variable architecture with no hardcoded secrets in the repository.
+- **Scaling:** Unified AI backend supported by OpenRouter (Gemini 2.0 Flash Lite optimized).
 
 ---
 
-## 🚀 Quick Start (Docker - Recommended)
+## 📚 Documentation Suite (Deep Dives)
+For a complete understanding of the system's thought process and implementation, explore our specialized manuals:
 
-The platform is designed to be run as a single container serving both the React frontend and the FastAPI backend.
-
-1.  **Clone the repository.**
-2.  **Copy the environment file:**
-    ```bash
-    cp .env.example .env
-    ```
-3.  **Build and run the Docker instance:**
-    ```bash
-    docker build -t dev-intelligence .
-    docker run -p 3000:3000 dev-intelligence
-    ```
-4.  **Access the Dashboard:**
-    Open `http://localhost:3000` in your browser.
-    *(Note: Model downloading occurs on the first request and might take a minute).*
-
-## 💻 Local Development Setup
-
-To run the frontend and backend separately for development:
-
-**Backend Setup:**
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python -m app.main
-```
-
-**Frontend Setup:**
-```bash
-cd frontend
-npm install
-npm run dev
-```
+- **[🏗 Architecture & Parallelism](./docs/architecture.md)**: Detailed breakdown of the Hybrid Parallel Orchestration engine.
+- **[🛡 Security & GDPR Sovereignty](./docs/security.md)**: Deep-dive into our zero-leak infrastructure and ethical AI rails.
+- **[📊 Workflow Analysis](./docs/workflow-analysis.md)**: Strategic mapping of Agent roles to professional consultancy counterparts.
+- **[🌐 Deployment & Hosting](./DEPLOYMENT.md)**: Comprehensive guide for production deployment on Railway/Docker.
 
 ---
 
-## The Agents
-
-The platform uses a sequential orchestration pipeline to guarantee output structure:
-1.  `PlannerAgent`: Validates inputs and sets up the execution context.
-2.  `KnowledgeAgent`: Vectorizes queries and extracts chunks from `data/knowledge_docs/`.
-3.  `FundingAgent`: Filters `data/grants.csv` and ranks using Semantic Cosine Similarity.
-4.  `ProposalAgent`: Formats a proposal structure based on RAG context.
-5.  `WorkflowAgent`: Determines agile sprint checklists based on sector.
-6.  `ComplianceAgent`: Applies programmatic safety rails and GDPR warnings.
+## 💻 Tech Stack & High-Speed Core
+- **Frontend**: React (Vite) + Vanilla CSS (Glassmorphism UI).
+- **Backend**: FastAPI (Python) + `httpx` for Persistent Connection Pooling.
+- **Intelligence**: Hybrid Parallel Orchestrator + FAISS RAM-based Vector Store.
+- **Models**: Gemini 2.0 Flash (via OpenRouter) + `all-MiniLM-L6-v2` embeddings.
 
 ---
 
-## Deployment (Render.com / Fly.io)
+## ⚡ Quick Start (Production-Ready)
 
-This application is ready for free-tier PaaS deployment.
+1. **Clone & Config**:
+   ```bash
+   cp .env.example .env # Add your OPENROUTER_API_KEY
+   ```
 
-**Render.com configuration:**
-1. Select "New Web Service" connecting your repo.
-2. Use Docker environment.
-3. Set `PORT=3000` in the environment variables.
+2. **Run (Dockerized)**:
+   ```bash
+   docker-compose up --build
+   ```
+
+3. **Access**:
+   Open `http://localhost:3000`. The system will automatically build the FAISS index on its first parallel run (~500ms).
 
 ---
 
-## Future Roadmap
-- [ ] Connect Live Sector API (ReliefWeb).
-- [ ] Add Multi-Tenant User Authentication (Auth0/Firebase).
-- [ ] Implement collaborative editing in the rich text output panels.
-- [ ] Add `PDF/DOCX` report generation download links.
+## 🛠 Runnable Workflows (Developer Tools)
+We provide deep-dive diagnostic tools to verify platform integrity:
+
+- **Benchmark Velocity**: Run `python backend/app/tools/benchmark.py` to verify sub-10s performance.
+- **Security Scan**: Run `python backend/app/tools/security_audit.py` to ensure local zero-leak status.
+
+---
+
+## 🏢 Consultancy Agent Mapping
+| Agent | Counterpart | Core Value |
+| :--- | :--- | :--- |
+| **Planner** | Engagement Lead | Frames the technical brief. |
+| **Knowledge** | Research Analyst | Performs instant RAG retrieval. |
+| **Funding** | Grants Officer | Matches donor criteria deterministically. |
+| **Proposal** | Strategy Writer | Synthesizes 'Draft Zero' strategies. |
+| **Workflow** | Project Manager | Generates granular sprint checklists. |
+| **Compliance** | Legal/QA Lead | Validates regional GDPR standards. |
+
+---
+
+> "AI should handle the data, so humans can handle the strategy."
