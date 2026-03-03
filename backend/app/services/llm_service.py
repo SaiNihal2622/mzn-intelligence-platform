@@ -100,7 +100,7 @@ async def _call_openrouter(prompt: str, system_instruction: Optional[str] = None
     messages.append({"role": "user", "content": prompt})
 
     payload = {
-        "model": "google/gemini-2.0-flash-lite-preview-02-05:free",  # Fast, free via OpenRouter
+        "model": "google/gemini-2.0-flash-lite-001",  # Verified working via OpenRouter
         "messages": messages,
     }
 
