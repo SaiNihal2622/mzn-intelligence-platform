@@ -82,12 +82,26 @@ def embed_text(text: str) -> List[float]:
     return _gemini_embed_single(text)
 
 
+import concurrent.futures
+
 def embed_batch(texts: List[str], batch_size: int = 50) -> List[List[float]]:
-    """Return embedding vectors for a batch of texts."""
+    """Return embedding vectors for a batch of texts concurrently."""
     results = []
-    for i, text in enumerate(texts):
-        vec = embed_text(text)
-        results.append(vec)
-        if (i + 1) % 10 == 0:
-            logger.info("Embedded %d/%d texts", i + 1, len(texts))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
+        # Submit all texts for embedding concurrently
+        future_to_index = {executor.submit(embed_text, text): i for i, text in enumerate(texts)}
+        
+        # Pre-allocate results list to maintain order
+        results = [[] for _ in range(len(texts))]
+        
+        for future in concurrent.futures.as_completed(future_to_index):
+            idx = future_to_index[future]
+            try:
+                vec = future.result()
+                results[idx] = vec
+            except Exception as e:
+                logger.error("Embedding failed for batch item %d: %s", idx, e)
+                results[idx] = _hash_embed(texts[idx])
+                
+    logger.info("Embedded %d texts concurrently", len(texts))
     return results

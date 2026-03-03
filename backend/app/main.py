@@ -88,7 +88,7 @@ class AnalysisResponse(BaseModel):
     """Full response schema from the agent pipeline."""
     funding_matches: List[FundingMatch]
     similar_projects: List[SimilarProject]
-    proposal_outline: Dict[str, Any]
+    proposal_outline: Any  # Can be dict or string depending on LLM output
     consultant_briefing: str
     workflow_tasks: List[WorkflowTask]
     compliance_notes: str
