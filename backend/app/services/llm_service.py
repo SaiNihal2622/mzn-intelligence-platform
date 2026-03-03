@@ -16,33 +16,16 @@ logger = logging.getLogger(__name__)
 async def generate_text(prompt: str, system_instruction: Optional[str] = None) -> str:
     """
     Main entry point for text generation.
-    Tries Gemini first, falls back to OpenRouter if failproof mode is on.
+    Uses OpenRouter as the exclusive stable provider.
     """
     if not settings.use_llm:
         return ""
 
-    # Build provider priority list (no 'local' — torch removed)
-    if settings.llm_provider == "gemini":
-        providers = ["gemini", "openrouter"] if settings.failproof_llm else ["gemini"]
-    elif settings.llm_provider == "openrouter":
-        providers = ["openrouter", "gemini"] if settings.failproof_llm else ["openrouter"]
-    else:
-        providers = ["gemini", "openrouter"]
-
-    last_error = None
-    for provider in providers:
-        try:
-            if provider == "gemini":
-                return await _call_gemini(prompt, system_instruction)
-            elif provider == "openrouter":
-                return await _call_openrouter(prompt, system_instruction)
-        except Exception as e:
-            last_error = e
-            logger.warning("LLM Provider '%s' failed: %s. Trying next...", provider, e)
-            continue
-
-    logger.error("All LLM providers failed. Last error: %s", last_error)
-    return "Generation failed. Please try again later or check your API keys."
+    try:
+        return await _call_openrouter(prompt, system_instruction)
+    except Exception as e:
+        logger.error(f"OpenRouter failed: {e}")
+        return "Generation failed. Please check your API keys or try again later."
 
 
 import httpx

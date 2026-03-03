@@ -19,12 +19,12 @@ class Settings(BaseSettings):
     embedding_model: str = "all-MiniLM-L6-v2"
     llm_model: str = "google/flan-t5-small"
     use_llm: bool = True
-    llm_provider: str = "openrouter"  # gemini, openrouter, local
+    llm_provider: str = "openrouter"  # Exclusive provider for stability
     failproof_llm: bool = True
     
     # --- API Keys ---
     gemini_api_key: str = "AIzaSyAEaPm5PZYjcr24guqEDvItKuWvyj7k1vo"
-    openrouter_api_key: str = "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"
+    openrouter_api_key: str = "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"
 
     # --- Server ---
     host: str = "0.0.0.0"
